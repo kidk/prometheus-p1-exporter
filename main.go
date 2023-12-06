@@ -118,10 +118,18 @@ func main() {
 			telegram, err := parser.ParseTelegram(&parser.XS210ESMR5TelegramFormat, lines)
 			if err != nil {
 				logrus.Errorln("Error while parsing telegram", err)
+				logrus.Errorln("Line to parse", lines)
 				errorCount++
 				time.Sleep(readInterval)
 				continue
 			}
+
+			// Temporary add to catch 0 values and debug
+			if telegram.ElectricityUsageHigh == 0 {
+				logrus.Errorln("0 values detected")
+				logrus.Errorln("Line to parse", lines)
+			}
+
 			errorCount = 0
 			electricityUsageHighMetric.Set(telegram.ElectricityUsageHigh)
 			electricityUsageLowMetric.Set(telegram.ElectricityUsageLow)
